@@ -10,13 +10,6 @@ port = 3306
 
 # [server]
 
-# [mysql]
-
-# user = mysql
-# pid-file = /run/mysqld/mysqld.pid
-# socket = /run/mysqld/mysqld.sock
-# datadir = /var/lib/mysql
-# bind-address = 0.0.0.0
-# # by default, mariaDB only allows connections from 'localhost'
-# # set bind addr to 0.0.0.0 to allow connection from ALL network
-# port = 3306
+# BIG Lesson! mysql is for [client], who have no right for 'datadir' and 'bing-add'
+# that's why it was 'unknown var'
+# [mysqld] or [mairadb] is [server], support these options!

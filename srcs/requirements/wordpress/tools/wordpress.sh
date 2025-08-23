@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# automate the process of setting up WP ENV with: 
+# - mk install dir; 
+# - config WP with env vars
+# - install WP with admin usr
+# - create another usr (editor)
+# -start php-fpm service to serve WP
+
 mkdir -p /var/www/wordpress
 cd /var/www/wordpress
 # create dir for wp
@@ -48,5 +55,23 @@ if ! wp core is-installed --allow-root; then
 		# user, ps, email => set up admin account with provided credentials
 		--skip-emal \
 		--allow-root
+
+	# create another usr 'editor' using provided env vars
 	wp user create \
-		"${WP_USER}" "${WP_USER_EMAIL}"
+		"${WP_USER}" "${WP_USER_EMAIL}" \
+		--user_pass="${WP_USER_PASSWORD}" \
+		--role=editor \
+		--allow-root
+fi
+
+if ! wp theme is-installed twentytwentyfour --allow-root; then
+	wp theme install twentytwentyfour --activate --allow-root
+else
+	wp theme activate twentytwentyfour --allow-root;
+fi
+
+mkdir -p /run/php
+# create runtime dir
+echo "Starting PHP-FPM..."
+php-fpm7.4 -F
+# start pgp-fpm in foreground

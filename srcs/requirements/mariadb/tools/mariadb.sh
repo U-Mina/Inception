@@ -6,17 +6,16 @@ service mariadb start;
 sleep 5;
 # wait for mariadb to start
 
+mysql -u root << EOF
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
+CREATE USER IF NOT EXISTS \`${MYSQL_USER}\`@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EOF
 # ensures these env vars are provided for config
-mysql -u "CREATE DATABASE IF NOT EXIST \'${MYSQL_DATABASE}\';"
-mysql -u "CREATE USER IF NOT EXIST \'${MYSQL_USER}\'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-
-mysql -u "GRANT ALL PREVILEGES ON \'${MYSQL_DATABASE}\'.* TO '${MYSQL_USER}'@'%';" 
 # grant user permission
-
-mysql -u "GRANT ALL PREVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}' WITH GRANT OPTION;"
 # updates mariadb root password
-
-mysql -u "FLUSH PRIVILEGES;"
 
 mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown;
 # stop mariadb temporarily after init to apply change

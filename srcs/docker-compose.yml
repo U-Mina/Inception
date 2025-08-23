@@ -73,3 +73,10 @@ networks:
   inception:
     name: inception
     driver: bridge
+
+# bridge: default driver for standalne containers, create isolated network on Docker host
+# host: rmv network isolation between containers and Docker host, directly share
+# none: completely isolate container from network, no External Nor internal connect possible
+# Custom Network: the network 'inception' is the customized network i invented
+#  => isolate external connection, allow INTERNAL connection between containars
+# 

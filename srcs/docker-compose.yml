@@ -1,0 +1,75 @@
+# Services needed: 
+#   - mariadb: database service for wp
+#   - nginx: web server for serving WP with https
+#   - wordpress: application container running wordpress with php-fpm
+# Volume and Network:
+#   - VOLUME: Persistent storage for mariadb and WP files
+#   - NETWORK: bridge network between containers!!!
+services:
+  mariadb:
+    container_name: mariadb
+    networks:
+      - inception
+    build: ./requirements/mariadb
+    image: mariadb:notlatest
+    env_file:
+      .env
+    volumes:
+      - mariadb:/var/lib/mysql
+    restart: always
+    expose:
+      - "3306" #internal connection between containers
+
+  nginx:
+    container_name: nginx
+    networks:
+      - inception
+    depends_on:
+      - wordpress # depends-on make sure WP starts before Nginx!!!
+    build: ./requirements/nginx
+    image: nginx:notlatest
+    env_file:
+      - .env
+    volumes:
+      - wordpress:/var/www/wordpress # mount wp files
+    restart: always
+    ports:
+      - "443:443"
+      # <HOST_PORT>:<CONTAINER_PORT> map 443 on the host to port 443 for HTTPS
+      # 443: extenal port on VM: https//server-ip:443
+      # 443 (right) : internally (inside container), nginx listen on 443
+  
+  wordpress:
+    container_name: wordpress
+    networks:
+      - inception
+    depends_on:
+      - mariadb # mariadb starts before wp
+    build: ./requirements/wordpress
+    image: wordpress:notlatest
+    env_file:
+      - .env
+    volumes:
+      - wordpress:/var/www/wordpress
+    restart: always
+    expose:
+      - "9000"
+
+volumes:
+  mariadb:
+    driver: local
+    driver_opts:
+      type: none
+      device: /User/ #
+      o: bind
+  wordpress:
+    driver: local
+    driver_opts:
+      type: none
+      device: /User
+      o: bind
+
+networks:
+  inception:
+    name: inception
+    driver: bridge

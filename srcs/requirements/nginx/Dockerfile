@@ -6,7 +6,7 @@ FROM debian:bullseye-slim
 RUN apt-get update && apt-get install -y nginx openssl gettext-base && \
 	rm -rf /var/lib/apt/lists/*
 	
-COPY conf/custom-site.template /etc/nginx/sites-enabled/custom-site.template
+COPY conf/custom-site /etc/nginx/sites-enabled/custom-site.template
 	# the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
 
 COPY tools/entrypoint.sh /entrypoint.sh

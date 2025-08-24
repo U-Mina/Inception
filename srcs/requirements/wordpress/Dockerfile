@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bullseye
 
 RUN apt-get update && apt-get install -y php7.3 php-mysqli php-fpm wget sendmail
 # RUN apt update -y && apt upgrade -y && \

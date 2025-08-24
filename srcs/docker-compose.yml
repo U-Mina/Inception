@@ -5,7 +5,7 @@
 # Volume and Network:
 #   - VOLUME: Persistent storage for mariadb and WP files
 #   - NETWORK: bridge network between containers!!!
-version: "3.5"
+# version: "3.5"
 
 networks:
   app-network:

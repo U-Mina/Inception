@@ -21,12 +21,7 @@ services:
     secrets:
       - db_root_password
       - db_password
-    # healthcheck:
-    #   test: ["CMD-SHELL", "mysql -uroot -p$(cat /run/secrets/db_root_password) -e \"USE ${MYSQL_DATABASE}; SELECT 1;\""]
-    #   interval: 20s
-    #   timeout: 10s
-    #   retries: 5
-      # start_period: 10s
+
     volumes:
       - mariadb_data:/var/lib/mysql
     restart: always
@@ -41,8 +36,8 @@ services:
     depends_on:
       - wordpress # depends-on make sure WP starts before Nginx!!!
         # condition: service_healthy
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
     volumes:

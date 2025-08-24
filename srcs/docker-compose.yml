@@ -21,12 +21,12 @@ services:
     secrets:
       - db_root_password
       - db_password
-    healthcheck:
-      test: ["CMD-SHELL", "mysql -uroot -p$(cat /run/secrets/db_root_password) -e \"USE ${MYSQL_DATABASE}; SELECT 1;\""]
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "mysql -uroot -p$(cat /run/secrets/db_root_password) -e \"USE ${MYSQL_DATABASE}; SELECT 1;\""]
+    #   interval: 20s
+    #   timeout: 10s
+    #   retries: 5
+      # start_period: 10s
     volumes:
       - mariadb_data:/var/lib/mysql
     restart: always

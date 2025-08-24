@@ -7,7 +7,7 @@ set -e
 mkdir -p /run/mysqld /var/lib/mysql
 chown -R mysql:mysql /run/mysqld /var/lib/mysql
 
-if [ ! -f "/var/lib/mysql/initialized"]; then
+if [ ! -f "/var/lib/mysql/initialized" ]; then
 	/docker-entrypoint-initdb.d/init.sh
 	touch /var/lib/mysql/initialized
 fi

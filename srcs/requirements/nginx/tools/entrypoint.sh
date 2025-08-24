@@ -29,17 +29,25 @@ else
 	echo "SSL certificates already exist. Skipping generation."
 fi
 
-# Generate NGINX configuration file
-if [ ! -f "${CONF_FILE}" ]; then
-	echo "Configuring NGINX..."
+# # Generate NGINX configuration file
+# if [ ! -f "${CONF_FILE}" ]; then
+# 	echo "Configuring NGINX..."
 
-	# Replace ${DOMAIN_NAME} in the NGINX configuration template
-	envsubst '${DOMAIN_NAME}' < "${CONF_FILE}.template" > "${CONF_FILE}"
-	rm -rf "${CONF_FILE}.template"
+# 	# Replace ${DOMAIN_NAME} in the NGINX configuration template
+# 	envsubst '${DOMAIN_NAME}' < "${CONF_FILE}.template" > "${CONF_FILE}"
+# 	rm -rf "${CONF_FILE}.template"
 
-	# Create symbolic link for the configuration file
-	ln -sf "${CONF_FILE}" /etc/nginx/sites-enabled/
+# 	# Create symbolic link for the configuration file
+# 	ln -sf "${CONF_FILE}" /etc/nginx/sites-enabled/
+# fi
+if [ -f "${CONF_FILE}.template" ]; then
+    envsubst '${DOMAIN_NAME}' < "${CONF_FILE}.template" > "${CONF_FILE}"
+    ln -sf "${CONF_FILE}" /etc/nginx/sites-enabled/
+else
+    echo "ERROR: Template ${CONF_FILE}.template not found!"
+    exit 1
 fi
+
 
 # Start NGINX in the foreground
 echo "Starting NGINX..."

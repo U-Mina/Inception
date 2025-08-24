@@ -3,15 +3,15 @@ DIR="./srcs/docker-compose.yml"
 all:
 	@mkdir -p $(HOME)/data/wordpress
 	@mkdir -p $(HOME)/data/mariadb
-	@docker-compose -f ./srcs/$(DIR) up
+	@docker compose -f $(DIR) up
 # up:
 # 	@docker compose -f $(DIR) up --build -d
 
 down:
-	@docker-compose -f $(DIR) down
+	@docker compose -f $(DIR) down
 
 re:
-	@@docker-compose -f $(DIR) up --build
+	@docker compose -f $(DIR) up --build
 
 clean:
 	@docker stop $$(docker ps -qa);\

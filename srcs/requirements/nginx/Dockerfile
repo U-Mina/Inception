@@ -29,13 +29,13 @@ EXPOSE 443
 # 	chown -R www-data:www-data /var/www/wordpress
 # 	# set ownership and permission for www-data usr
 
-COPY ./conf/default/ /etc/nginx/sites-enabled/default
+COPY ./conf/default /etc/nginx/sites-enabled/default
 	# the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
 COPY ./tools/nginx_start.sh /var/www
 
 RUN cgmod +x /var/www/nginx_start.sh
 
-ENTRYPOINT [ "var/www/nginx_start.sh" ]
+ENTRYPOINT [ "/var/www/nginx_start.sh" ]
 
 CMD ["nginx", "-g", "daemon off;"]
 	# run nginx in the foreground(daemon off), ensuring container stays alive

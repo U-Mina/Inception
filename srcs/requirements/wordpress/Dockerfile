@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y php7.3 php-mysqli php-fpm wget sendmail
 	# php-mysql: php extension to interact with mysql
 	# mariadb-client: allow container to interact with mariadb server
 
-	EXPOSE 9000
+EXPOSE 9000
 
 COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d
 	# cpy conf into ocntainer

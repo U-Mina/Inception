@@ -5,40 +5,30 @@
 # Volume and Network:
 #   - VOLUME: Persistent storage for mariadb and WP files
 #   - NETWORK: bridge network between containers!!!
-# version: "3.5"
-
-networks:
-  app-network:
-    name: app-network
-    driver: bridge
-
-volumes:
-  db:
-    driver: local
-    name: db
-    driver_opts:
-      type: none
-      o: bind
-      device: /$HOME/data/mariadb
-  wp:
-    driver: local
-    name: wp
-    driver_opts:
-      type: none
-      o: bind
-      device: /$HOME/data/wordpress
+version: "3.8"
 
 services:
   mariadb:
     container_name: mariadb
     build: ./requirements/mariadb
     networks:
-      - app-network
-    # image: mariadb:notlatest
-    env_file:
-      .env
+      - inception_network
+    # env_file:
+    #   .env
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+    secrets:
+      - db_root_password
+      - db_password
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -uroot -p$(cat /run/secrets/db_root_password) -e \"USE ${MYSQL_DATABASE}; SELECT 1;\""]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
     volumes:
-      - db:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     restart: always
     # expose:
     #   - "3306" #internal connection between containers
@@ -47,15 +37,17 @@ services:
     container_name: nginx
     build: ./requirements/nginx
     networks:
-      - app-network
+      - inception_network
     depends_on:
-      - wordpress # depends-on make sure WP starts before Nginx!!!
-    # image: nginx:notlatest
+      wordpress: # depends-on make sure WP starts before Nginx!!!
+        condition: service_healthy
     # env_file:
     #   - .env
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
     volumes:
-      - wp:/var/www/html # mount wp files
-    restart: unless-stopped
+      - wordpress_data:/var/www/html # mount wp files
+    restart: always
     ports:
       - "443:443"
       # <HOST_PORT>:<CONTAINER_PORT> map 443 on the host to port 443 for HTTPS
@@ -64,21 +56,62 @@ services:
   
   wordpress:
     container_name: wordpress
-    networks:
-      - app-network
-    depends_on:
-      - mariadb # mariadb starts before wp
     build: ./requirements/wordpress
-    # image: wordpress:notlatest
-    env_file:
-      - .env
+    networks:
+      - inception_network
+    depends_on:
+      mariadb: # mariadb starts before wp
+        condition: service_healthy
+    # env_file:
+    #   - .env
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - WORDPRESS_DB_HOST=${WP_DB_HOST}
+      - WORDPRESS_DB_USER=${WP_DB_USER}
+      - WORDPRESS_DB_NAME=${WP_DB_NAME}
+      - WORDPRESS_TITLE=${WP_TITLE}
+      - WORDPRESS_ADMIN=${WP_ADMIN}
+      - WORDPRESS_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+      - WORDPRESS_REGULAR_USER=${WP_REGULAR_USER}
+      - WORDPRESS_REGULAR_EMAIL=${WP_REGULAR_EMAIL}
+    secrets:
+      - db_password
+      - wp_password
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9000"]
+      interval: 20s
+      timeout: 15s
+      retries: 10
+      start_period: 10s
     volumes:
-      - wp:/var/www/html
-    restart: unless-stopped
-    # expose:
-    #   - "9000"
+      - wordpress_data:/var/www/html
+    restart: always
 
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_PATH}/mariadb
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_PATH}/wordpress
 
+networks:
+  inception_network:
+    driver: bridge
+
+secrets:
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_password:
+    file: ../secrets/db_password.txt
+  wp_password:
+    file: ../secrets/wp_password.txt
 
 # bridge: default driver for standalne containers, create isolated network on Docker host
 # host: rmv network isolation between containers and Docker host, directly share

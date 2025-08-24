@@ -39,8 +39,8 @@ services:
     networks:
       - inception_network
     depends_on:
-      wordpress: # depends-on make sure WP starts before Nginx!!!
-        condition: service_healthy
+      - wordpress # depends-on make sure WP starts before Nginx!!!
+        # condition: service_healthy
     # env_file:
     #   - .env
     environment:
@@ -60,8 +60,8 @@ services:
     networks:
       - inception_network
     depends_on:
-      mariadb: # mariadb starts before wp
-        condition: service_healthy
+      - mariadb # mariadb starts before wp
+        # condition: service_healthy
     # env_file:
     #   - .env
     environment:
@@ -77,12 +77,12 @@ services:
     secrets:
       - db_password
       - wp_password
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9000"]
-      interval: 20s
-      timeout: 15s
-      retries: 10
-      start_period: 10s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "nc -z localhost 9000"]
+    #   interval: 20s
+    #   timeout: 15s
+    #   retries: 10
+    #   start_period: 10s
     volumes:
       - wordpress_data:/var/www/html
     restart: always

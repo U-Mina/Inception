@@ -1,12 +1,26 @@
-FROM debian:bullseye
+FROM debian:bullseye-slim
 
 # RUN apt update -y && apt upgrade -y && \
 # 	apt install -y nginx openssl && \
 # 	apt clean && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y nginx openssl
+RUN apt-get update && apt-get install -y nginx openssl gettext-base && \
+	rm -rf /var/lib/apt/lists/*
+	
+COPY conf/custom-site /etc/nginx/sites-enabled/custom-site.template
+	# the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
 
-EXPOSE 443
+COPY tools/entrypoint.sh /entrypoint.sh
 
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+
+# CMD ["nginx", "-g", "daemon off;"]
+	# run nginx in the foreground(daemon off), ensuring container stays alive
+
+	# web server for wp
+
+	# the following is removed to entrypoint.sh!
 # RUN mkdir -p /etc/nginx/ssl && \
 # 	# mkdir -p /etc/nginx/ssl: create dir to store SSL files
 # 	openssl req -x509 -nodes -days 365 \
@@ -28,16 +42,3 @@ EXPOSE 443
 # 	chmod 755 /var/www/wordpress && \
 # 	chown -R www-data:www-data /var/www/wordpress
 # 	# set ownership and permission for www-data usr
-
-COPY ./conf/default /etc/nginx/sites-enabled/default
-	# the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
-COPY ./tools/nginx_start.sh /var/www
-
-RUN chmod +x /var/www/nginx_start.sh
-
-ENTRYPOINT [ "/var/www/nginx_start.sh" ]
-
-CMD ["nginx", "-g", "daemon off;"]
-	# run nginx in the foreground(daemon off), ensuring container stays alive
-
-# web server for wp

@@ -33,7 +33,7 @@ COPY ./conf/default /etc/nginx/sites-enabled/default
 	# the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
 COPY ./tools/nginx_start.sh /var/www
 
-RUN cgmod +x /var/www/nginx_start.sh
+RUN chmod +x /var/www/nginx_start.sh
 
 ENTRYPOINT [ "/var/www/nginx_start.sh" ]
 

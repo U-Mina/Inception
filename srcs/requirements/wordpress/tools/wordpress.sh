@@ -46,15 +46,15 @@ if ! wp core is-installed --allow-root; then
 	# install wp
 	wp core install \
 		--url="${DOMAIN_NAME}" \
-		# domain name for wp site
 		--title="${SITE_TITLE}" \
-		# site title (eg "inception")
 		--admin_user="${WP_ADMIN_USER}" \
 		--admin_password="${WP_ADMIN_PASSWORD}" \
 		--admin_email="${WP_ADMIN_EMAIL}" \
-		# user, ps, email => set up admin account with provided credentials
 		--skip-emal \
 		--allow-root
+		# domain name for wp site
+		# site title (eg "inception")
+		# user, ps, email => set up admin account with provided credentials
 
 	# create another usr 'editor' using provided env vars
 	wp user create \

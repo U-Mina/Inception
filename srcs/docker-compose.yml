@@ -10,38 +10,37 @@ version: "3.8"
 services:
   mariadb:
     container_name: mariadb
-    build: ./requirements/mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
     networks:
-      - inception_network
-    # env_file:
-    #   .env
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-    secrets:
-      - db_root_password
-      - db_password
-
+      - inception
+    env_file:
+      .env
+    # environment:
+    #   - MYSQL_DATABASE=${MYSQL_DATABASE}
+    #   - MYSQL_USER=${MYSQL_USER}
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     restart: always
     # expose:
     #   - "3306" #internal connection between containers
 
   nginx:
     container_name: nginx
-    build: ./requirements/nginx
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
     networks:
       - inception_network
     depends_on:
       - wordpress # depends-on make sure WP starts before Nginx!!!
-        # condition: service_healthy
-    env_file:
-      - .env
-    environment:
-      - DOMAIN_NAME=${DOMAIN_NAME}
+    # env_file:
+    #   - .env
+    # environment:
+    #   - DOMAIN_NAME=${DOMAIN_NAME}
     volumes:
-      - wordpress_data:/var/www/html # mount wp files
+      - wordpress:/var/www/html # mount wp files
     restart: always
     ports:
       - "443:443"
@@ -51,36 +50,35 @@ services:
   
   wordpress:
     container_name: wordpress
-    build: ./requirements/wordpress
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
     networks:
-      - inception_network
+      - inception
     depends_on:
       - mariadb # mariadb starts before wp
         # condition: service_healthy
-    # env_file:
-    #   - .env
-    environment:
-      - DOMAIN_NAME=${DOMAIN_NAME}
-      - WORDPRESS_DB_HOST=${WP_DB_HOST}
-      - WORDPRESS_DB_USER=${WP_DB_USER}
-      - WORDPRESS_DB_NAME=${WP_DB_NAME}
-      - WORDPRESS_TITLE=${WP_TITLE}
-      - WORDPRESS_ADMIN=${WP_ADMIN}
-      - WORDPRESS_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
-      - WORDPRESS_REGULAR_USER=${WP_REGULAR_USER}
-      - WORDPRESS_REGULAR_EMAIL=${WP_REGULAR_EMAIL}
-    secrets:
-      - db_password
-      - wp_password
+    env_file:
+      - .env
+    volumes:
+      - wordpress:/var/www/html
+    restart: always
+    # environment:
+    #   - DOMAIN_NAME=${DOMAIN_NAME}
+    #   - WORDPRESS_DB_HOST=${WP_DB_HOST}
+    #   - WORDPRESS_DB_USER=${WP_DB_USER}
+    #   - WORDPRESS_DB_NAME=${WP_DB_NAME}
+    #   - WORDPRESS_TITLE=${WP_TITLE}
+    #   - WORDPRESS_ADMIN=${WP_ADMIN}
+    #   - WORDPRESS_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+    #   - WORDPRESS_REGULAR_USER=${WP_REGULAR_USER}
+    #   - WORDPRESS_REGULAR_EMAIL=${WP_REGULAR_EMAIL}
     # healthcheck:
     #   test: ["CMD-SHELL", "nc -z localhost 9000"]
     #   interval: 20s
     #   timeout: 15s
     #   retries: 10
     #   start_period: 10s
-    volumes:
-      - wordpress_data:/var/www/html
-    restart: always
 
 volumes:
   mariadb:

@@ -32,7 +32,7 @@ services:
       context: ./requirements/nginx
       dockerfile: Dockerfile
     networks:
-      - inception_network
+      - inception
     depends_on:
       - wordpress # depends-on make sure WP starts before Nginx!!!
     # env_file:

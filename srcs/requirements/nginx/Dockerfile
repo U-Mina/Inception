@@ -4,8 +4,8 @@ FROM debian:bullseye
 # 	apt install -y nginx openssl && \
 # 	apt clean && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y nginx openssl && \
-	rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y nginx openssl
+	# rm -rf /var/lib/apt/lists/*
 
 RUN openssl req -x509 -nodes -days 365 \
 	-newkey rsa:2048 \
@@ -16,6 +16,8 @@ RUN openssl req -x509 -nodes -days 365 \
 
 COPY ./conf /etc/nginx/sites-available/default
 # the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
+
+EXPOSE 443
 
 CMD ["nginx", "-g", "daemon off;"]
 

@@ -22,6 +22,7 @@ COPY ./start.sh .
 
 RUN chmod +x start.sh
 
+CMD ["./start.sh"]
 # COPY tools/entrypoint.sh /entrypoint.sh
 # 	# mariadb.sh: customized .sh for initing database and usrs
 
@@ -32,5 +33,4 @@ RUN chmod +x start.sh
 # # from that file and run them on the running MySQL server (namely, init DB)
 
 # ENTRYPOINT ["/entrypoint.sh"]
-CMD ["./start.sh"]
 	# run this on container start

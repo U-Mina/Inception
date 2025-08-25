@@ -1,21 +1,28 @@
-FROM debian:bullseye-slim
+FROM debian:bullseye
 
 # RUN apt update -y && apt upgrade -y && \
 # 	apt install -y nginx openssl && \
 # 	apt clean && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y nginx openssl gettext-base && \
+
+RUN apt-get update && apt-get install -y nginx openssl && \
 	rm -rf /var/lib/apt/lists/*
-	
-COPY conf/custom-site /etc/nginx/sites-available/custom-site.template
-	# the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
 
-COPY tools/entrypoint.sh /entrypoint.sh
+RUN openssl req -x509 -nodes -days 365 \
+	-newkey rsa:2048 \
+	-keyout /etc/ssl/private/nginx-selfsigned.key \
+	-out /etc/ssl/certs/nginx-selfsigned.crt \
+	-subj "/C=DE/ST=HN/L=42HN/O=42/OU=codet/CN=localhost" \
+	-addext "subjectAltName=DNS:localhost,DNS:ewu.42.fr,DNS:www.ewu.42.fr"
 
-RUN chmod +x /entrypoint.sh
+COPY ./conf /etc/nginx/sites-available/default
+# the nginx.conf is copied TO container at '/etc/nginx/nginx.conf'
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+CMD ["nginx", "-g", "daemon off;"]
 
-# CMD ["nginx", "-g", "daemon off;"]
+# RUN chmod +x /entrypoint.sh
+
+# ENTRYPOINT [ "/entrypoint.sh" ]
+
 	# run nginx in the foreground(daemon off), ensuring container stays alive
 
 	# web server for wp

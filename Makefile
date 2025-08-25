@@ -1,5 +1,6 @@
 DIR=srcs/docker-compose.yml
 DATA=/home/ewu/data
+COMPOSE = docker-compose
 
 all: build up
 
@@ -8,29 +9,29 @@ build:
 	@echo "Building Docker images..."
 	mkdir -p $(DATA)/mariadb
 	mkdir -p $(DATA)/wordpress
-	cd $(DIR) && docker compose build
+	docker-compose -f $(DIR) build
 
 # Start containers
 up:
-	cd $(DIR) && docker compose up -d
+	docker-compose -f $(DIR) up -d
 
 # Stop and remove containers
 down:
 	@echo "Removing containers..."
-	cd $(DIR) && docker compose down
+	docker-compose -f $(DIR) down
 
 # Start stopped containers (without rebuilding)
 start:
 	@echo "Starting containers..."
-	cd $(DIR) && docker compose start
+	docker-compose -f $(DIR) start
 
 # Stop running containers (without removing them)
 stop:
-	cd $(DIR) && docker compose stop
+	docker-compose -f $(DIR) stop
 
 # Clean everything (containers, volumes, network)
 clean: down
-	cd $(DIR) && docker compose down -v --rmi all
+	docker-compose -f $(DIR) down -v --rmi all
 	sudo rm -rf $(DATA)/mariadb
 	sudo rm -rf $(DATA)/wordpress
 

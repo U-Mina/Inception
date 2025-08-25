@@ -83,30 +83,22 @@ services:
     restart: always
 
 volumes:
-  mariadb_data:
+  mariadb:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${VOLUME_PATH}/mariadb
-  wordpress_data:
+      device: /home/ewu/data/mariadb
+  wordpress:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${VOLUME_PATH}/wordpress
+      device: /home/ewu/data/wordpress
 
 networks:
-  inception_network:
-    driver: bridge
-
-secrets:
-  db_root_password:
-    file: ../secrets/db_root_password.txt
-  db_password:
-    file: ../secrets/db_password.txt
-  wp_password:
-    file: ../secrets/wp_password.txt
+  inception:
+    name: inception
 
 # bridge: default driver for standalne containers, create isolated network on Docker host
 # host: rmv network isolation between containers and Docker host, directly share

@@ -10,6 +10,7 @@
 services:
   mariadb:
     container_name: mariadb
+    image: mariadb:notlatest
     build:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
@@ -28,6 +29,7 @@ services:
 
   nginx:
     container_name: nginx
+    image: nginx:notlatest
     build:
       context: ./requirements/nginx
       dockerfile: Dockerfile
@@ -50,6 +52,8 @@ services:
   
   wordpress:
     container_name: wordpress
+    image: wordpress:notlatest
+    image_name: 
     build:
       context: ./requirements/wordpress
       dockerfile: Dockerfile

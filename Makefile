@@ -1,46 +1,53 @@
-DIR=srcs/docker-compose.yml
 DATA=/home/ewu/data
 
-all: build up
+# adapt to docker compose versions 
+COMPOSE = $(shell \
+    if docker compose version >/dev/null 2>&1; then \
+        echo "docker compose"; \
+    elif docker-compose version >/dev/null 2>&1; then \
+        echo "docker-compose"; \
+    else \
+        echo "docker compose"; \
+    fi)
+
+# default
+all: build
 
 # Build Docker images
 build:
 	@echo "Building Docker images..."
-	mkdir -p $(DATA)/mariadb
-	mkdir -p $(DATA)/wordpress
-	docker compose -f $(DIR) build
+	@cd srcs && $(COMPOSE) up --build -d
 
-# Start containers
-up:
-	docker compose -f $(DIR) up -d
+# up:
+# 	docker compose -f $(DIR) up -d
 
 # Stop and remove containers
 down:
 	@echo "Removing containers..."
-	docker compose -f $(DIR) down
+	@cd srcs && $(COMPOSE) down
 
 # Start stopped containers (without rebuilding)
-start:
-	@echo "Starting containers..."
-	docker compose -f $(DIR) start
+# start:
+# 	@echo "Starting containers..."
+# 	docker compose -f $(DIR) start
 
 # Stop running containers (without removing them)
 stop:
-	docker compose -f $(DIR) stop
+	@cd srcs && $(COMPOSE) stop
 
 # Clean everything (containers, volumes, network)
 clean: down
-	docker compose -f $(DIR) down -v --rmi all
-	sudo rm -rf $(DATA)/mariadb
-	sudo rm -rf $(DATA)/wordpress
+	@cd srcs && $(COMPOSE) down -v --rmi all
+	@sudo rm -rf $(DATA)/mariadb
+	@sudo rm -rf $(DATA)/wordpress
 
 # Full clean: remove everything (containers, images, volumes, networks)
 fclean: clean
-	docker system prune -a -f
-	docker network prune -f
+	@docker system prune -a -f
+	@docker network prune -f
 
 # Rebuild and restart containers
-re: clean build up
+re: clean build
 
 .PHONY: all build up down start stop clean fclean re
 
